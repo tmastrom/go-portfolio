@@ -2,8 +2,10 @@ package main
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,8 +36,8 @@ type HeaderData struct {
 func newHeaderData() HeaderData {
 	return HeaderData{
 		Headers: []Header{
-			newHeader("Contact", "/contact"),
 			newHeader("Blog", "/blog"),
+			newHeader("Contact", "/contact"),
 		},
 	}
 }
@@ -88,6 +90,30 @@ func PostHandler(sl SlugReader) gin.HandlerFunc {
 	}
 }
 
+func RemoveExtensionFromFilename(filename string) string {
+	return filename[:len(filename)-len(filepath.Ext(filename))]
+}
+
+func ListFiles(dir string) []string {
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var filenames []string
+	for _, v := range entries {
+		if v.IsDir() {
+			continue
+		}
+		if filepath.Ext(v.Name()) != ".md" {
+			continue
+		}
+
+		filenames = append(filenames, RemoveExtensionFromFilename(v.Name()))
+	}
+	return filenames
+}
+
 func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -106,7 +132,8 @@ func main() {
 	})
 
 	router.GET("/blog", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "blog", page)
+		files := ListFiles("posts")
+		c.HTML(http.StatusOK, "blog", files)
 	})
 
 	router.GET("/blog/:post", PostHandler(fr))
