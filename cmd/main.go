@@ -104,7 +104,7 @@ func PostHandler(sl SlugReader) gin.HandlerFunc {
 		metaData := meta.Get(context)
 		title := metaData["title"]
 
-		c.HTML(http.StatusOK, "post", gin.H{
+		c.HTML(http.StatusOK, "blog-post", gin.H{
 			"Title":    title,
 			"Markdown": template.HTML(buf.String()),
 		})

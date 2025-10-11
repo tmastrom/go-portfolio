@@ -7,3 +7,8 @@
 .nav-link:hover {
   text-decoration: underline;
 }
+
+.container {
+  margin: auto;
+  max-width: 40em;
+}
