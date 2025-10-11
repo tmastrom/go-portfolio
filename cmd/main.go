@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yuin/goldmark"
 )
 
 type Header struct {
@@ -83,10 +85,22 @@ func PostHandler(sl SlugReader) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "post", gin.H{
-			"Title":    slug,
-			"Markdown": postMarkdown,
-		})
+		md := goldmark.New()
+
+		var buf bytes.Buffer
+		if err := md.Convert([]byte(postMarkdown), &buf); err != nil {
+			panic(err)
+		}
+
+		// c.HTML(http.StatusOK, "post", gin.H{
+		// 	"Title":    slug,
+		// 	"Markdown": buf.String(),
+		// })
+		res := map[string]any{
+			"ParsedMarkdown": buf.String(),
+		}
+
+		c.HTML(http.StatusOK, "post", res)
 	}
 }
 
@@ -108,7 +122,6 @@ func ListFiles(dir string) []string {
 		if filepath.Ext(v.Name()) != ".md" {
 			continue
 		}
-
 		filenames = append(filenames, RemoveExtensionFromFilename(v.Name()))
 	}
 	return filenames

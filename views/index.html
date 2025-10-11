@@ -48,7 +48,7 @@
 
 {{ block "header-link" . }}
 	<div id="header-{{ .Name }}" 
-		class="header-link"
+		class="nav-link"
 		hx-get="{{ .Path }}"
 		hx-target="#page-content" style="text-align: center; margin: 1rem 3rem;">
 		{{ .Name }}
@@ -65,14 +65,22 @@
 	<ul>	
 		{{ range . }}
 			<li>
-				<a href="blog/{{ . }}">
+				<a 
+					class="nav-link"
+					href="/blog/{{ . }}"	
+				>
 					{{ . }}
 				</a>
 			</li>
 		{{ end }}
 	</ul>
-
 {{ end}}
+
+{{ block "markdown" . }}
+	<body>
+		{{ .ParsedMarkdown }}
+	</body>
+{{ end }}
 
 {{ block "contact" . }}
 	<h1>Contact</h1>

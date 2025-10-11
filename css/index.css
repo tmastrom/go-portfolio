@@ -1,9 +1,9 @@
-.header-link {
+.nav-link {
   color: #283618;
   text-decoration: none;
   cursor: pointer;
 }
 
-.header-link:hover {
+.nav-link:hover {
   text-decoration: underline;
 }
