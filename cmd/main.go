@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -96,11 +97,11 @@ func PostHandler(sl SlugReader) gin.HandlerFunc {
 		// 	"Title":    slug,
 		// 	"Markdown": buf.String(),
 		// })
-		res := map[string]any{
-			"ParsedMarkdown": buf.String(),
-		}
+		// res := map[string]any{
+		// 	"ParsedMarkdown": buf.String(),
+		// }
 
-		c.HTML(http.StatusOK, "post", res)
+		c.HTML(http.StatusOK, "post", template.HTML(buf.String()))
 	}
 }
 
