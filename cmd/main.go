@@ -11,6 +11,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yuin/goldmark"
+	meta "github.com/yuin/goldmark-meta"
+	"github.com/yuin/goldmark/parser"
 )
 
 type Header struct {
@@ -86,22 +88,26 @@ func PostHandler(sl SlugReader) gin.HandlerFunc {
 			return
 		}
 
-		md := goldmark.New()
+		md := goldmark.New(
+			goldmark.WithExtensions(
+				meta.Meta,
+			),
+		)
 
 		var buf bytes.Buffer
-		if err := md.Convert([]byte(postMarkdown), &buf); err != nil {
+		context := parser.NewContext()
+
+		if err := md.Convert([]byte(postMarkdown), &buf, parser.WithContext(context)); err != nil {
 			panic(err)
 		}
 
-		// c.HTML(http.StatusOK, "post", gin.H{
-		// 	"Title":    slug,
-		// 	"Markdown": buf.String(),
-		// })
-		// res := map[string]any{
-		// 	"ParsedMarkdown": buf.String(),
-		// }
+		metaData := meta.Get(context)
+		title := metaData["title"]
 
-		c.HTML(http.StatusOK, "post", template.HTML(buf.String()))
+		c.HTML(http.StatusOK, "post", gin.H{
+			"Title":    title,
+			"Markdown": template.HTML(buf.String()),
+		})
 	}
 }
 

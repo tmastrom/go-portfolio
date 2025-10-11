@@ -1,5 +1,4 @@
 {{ block "post" . }}
-	<body>
-		{{ . }}
-	</body>
+    <h1>{{ .Title }}</h1>
+    {{ .Markdown }}
 {{ end }}
