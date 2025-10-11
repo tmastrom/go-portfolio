@@ -1,0 +1,24 @@
+{{ block "post" . }}
+<!DOCTYPE html> 
+<html lang="en">
+	<head> 
+		<title></title>
+		<meta chaset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="/css/index.css" rel="stylesheet">
+		<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js" integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<div id="page-content"> 
+            <a href="/">Home</a>
+			{{ template "blog-post" . }}
+		</div>
+	</body>
+</html>
+{{ end }}
+
+
+{{ block "blog-post" . }}
+    <h1>Title: {{ .Title }}</h1>
+    <p>{{ .Markdown }}</p>
+{{ end }}
