@@ -10,21 +10,6 @@
 		<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js" integrity="sha384-ZBXiYtYQ6hJ2Y0ZNoYuI+Nq5MqWBr+chMrS/RkXpNzQCApHEhOt2aY8EJgqwHLkJ" crossorigin="anonymous"></script>
 	</head>
 	<body>
-		<script>
-			document.addEventListener("DOMContentLoaded", (event) => {
-				document.body.addEventListener('htmx:beforeSwap', function(evt) {
-					if (evt.detail.xhr.status === 422){
-						// allow 422 responses to swap 
-						// we are using 422 as a signal that a form was submitted with bad data
-						// and we want to rerender with the errors 
-						//
-						// set isError to false to avoid logging in the console 
-						evt.detail.shouldSwap = true;
-						evt.detail.isError = false;
-					}
-				})
-			})
-		</script>
 		{{ template "header" .HeaderData }}
 		<hr />
 		<div id="page-content"> 
@@ -66,58 +51,4 @@
 	</div>
 {{ end }}
 
-{{ block "blog" . }}
-	<div class="container">  
-		<h1>Blog Posts</h1>
-		<ul>	
-			{{ range . }}
-				<li>
-					<div 
-						class="nav-link"
-						hx-get="blog/{{ . }}"
-						hx-push-url="{{ . }}"
-						hx-target="#page-content">
-						{{ . }}
-					</div>
-				</li>
-			{{ end }}
-		</ul>
-	</div>
-{{ end}}
-
-{{ block "blog-post" . }}
-	<div class="container">    
-		<h1>{{ .Title }}</h1>
-    	{{ .Markdown }}
-	</div>
-{{ end }}
-
-{{ block "markdown" . }}
-	<body>
-		{{ .ParsedMarkdown }}
-	</body>
-{{ end }}
-
-{{ block "contact" . }}
-	<div class="container">
-		<h1>Contact</h1>
-		<ul>
-			<li>
-				<a href="https://github.com/tmastrom" target="_blank" rel="noreferrer">
-				GitHub
-				</a>
-			</li>
-			<li>
-				<a href="https://www.linkedin.com/in/tmastro/" target="_blank" rel="noreferrer">
-				Linkedin
-				</a>
-			</li>
-			<li>
-				<a href="thomas.mastromonaco@gmail.com" target="_blank" rel="noreferrer">
-				Email
-				</a>
-			</li>
-		</ul>
-	</div>
-{{ end}}
 

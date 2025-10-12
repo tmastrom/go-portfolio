@@ -49,6 +49,7 @@ func newHeaderData() HeaderData {
 
 type Page struct {
 	HeaderData HeaderData
+	PageName   string
 }
 
 func newPage() Page {
