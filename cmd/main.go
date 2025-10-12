@@ -47,14 +47,23 @@ func newHeaderData() HeaderData {
 	}
 }
 
+type BlogData struct {
+	FileNames []string
+}
+
+func newBlogData() BlogData {
+	return BlogData{}
+}
+
 type Page struct {
 	HeaderData HeaderData
-	PageName   string
+	BlogData   BlogData
 }
 
 func newPage() Page {
 	return Page{
 		HeaderData: newHeaderData(),
+		BlogData:   newBlogData(),
 	}
 }
 
@@ -142,26 +151,42 @@ func main() {
 	router.Static("/images", "images")
 	router.Static("/css", "css")
 
-	router.LoadHTMLGlob("views/*")
+	router.LoadHTMLGlob("templates/*.html")
 
 	page := newPage()
 
-	fr := FileReader{}
+	// Parse all the layout
+	layouts := template.Must(template.ParseGlob("templates/layout/*.html"))
+	// Clone the layout and add the page content
+	profile := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/profile.html"))
+	blog := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog.html"))
+	contact := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/contact.html"))
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index", page)
+		profile.ExecuteTemplate(c.Writer, "index", page)
 	})
 
 	router.GET("/blog", func(c *gin.Context) {
 		files := ListFiles("posts")
-		c.HTML(http.StatusOK, "blog", files)
-	})
+		page.BlogData.FileNames = files
 
-	router.GET("/blog/:post", PostHandler(fr))
+		// if c.Request.Header["Hx-Request"] != nil {
+		// 	c.HTML(http.StatusOK, "blog.html", page)
+		// 	return
+		// }
+		blog.ExecuteTemplate(c.Writer, "index", page)
+	})
 
 	router.GET("/contact", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "contact", page)
+		// if c.Request.Header["Hx-Request"] != nil {
+		// 	c.HTML(http.StatusOK, "contact.html", page)
+		// 	return
+		// }
+		contact.ExecuteTemplate(c.Writer, "index", page)
 	})
+
+	fr := FileReader{}
+	router.GET("/blog/:post", PostHandler(fr))
 
 	router.Run(":8080")
 }

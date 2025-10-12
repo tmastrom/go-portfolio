@@ -1,13 +1,13 @@
-{{ block "blog" . }}
+{{ block "content" . }}
 	<div class="container">  
 		<h1>Blog Posts</h1>
 		<ul>	
-			{{ range . }}
+			{{ range .BlogData.FileNames }}
 				<li>
 					<div 
 						class="nav-link"
 						hx-get="blog/{{ . }}"
-						hx-push-url="{{ . }}"
+						hx-push-url="blog/{{ . }}"
 						hx-target="#page-content">
 						{{ . }}
 					</div>

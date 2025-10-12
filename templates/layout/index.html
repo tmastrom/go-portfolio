@@ -13,7 +13,7 @@
 		{{ template "header" .HeaderData }}
 		<hr />
 		<div id="page-content"> 
-			{{ template "profile" . }}
+			{{ template "content" . }}
 		</div>
 	</body>
 </html>
@@ -44,11 +44,6 @@
 	</div>
 {{ end }}
 
-{{ block "profile" . }}
-	<div class="container">  
-		<h1>Thomas Mastromonaco</h1>
-		<p>Software Developer</p>
-	</div>
-{{ end }}
+
 
 
