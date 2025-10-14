@@ -1,0 +1,11 @@
+{{ block "content" . }}
+	<div class="container">    
+    	{{ .BlogPostData.Markdown }}
+	</div>
+{{ end }}
+
+{{ block "blog-post" . }}
+	<div class="container">    
+    	{{ .Markdown }}
+	</div>
+{{ end }}
