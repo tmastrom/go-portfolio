@@ -42,7 +42,7 @@ func newHeaderData() HeaderData {
 	return HeaderData{
 		Headers: []Header{
 			newHeader("Projects", "/blog"),
-			newHeader("Chess", "/chess"),
+			// newHeader("Chess", "/chess"),
 			newHeader("Contact", "/contact"),
 		},
 	}
