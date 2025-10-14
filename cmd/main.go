@@ -55,15 +55,25 @@ func newBlogData() BlogData {
 	return BlogData{}
 }
 
+type BlogPostData struct {
+	Markdown template.HTML
+}
+
+func newBlogPostData() BlogPostData {
+	return BlogPostData{}
+}
+
 type Page struct {
-	HeaderData HeaderData
-	BlogData   BlogData
+	HeaderData   HeaderData
+	BlogData     BlogData
+	BlogPostData BlogPostData
 }
 
 func newPage() Page {
 	return Page{
-		HeaderData: newHeaderData(),
-		BlogData:   newBlogData(),
+		HeaderData:   newHeaderData(),
+		BlogData:     newBlogData(),
+		BlogPostData: newBlogPostData(),
 	}
 }
 
@@ -84,41 +94,7 @@ func (fr FileReader) Read(slug string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	// cast byte[] to string
 	return string(b), nil
-}
-
-func PostHandler(sl SlugReader) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		slug := c.Param("post")
-		postMarkdown, err := sl.Read(slug)
-		if err != nil {
-			c.Status(404)
-			return
-		}
-
-		md := goldmark.New(
-			goldmark.WithExtensions(
-				meta.Meta,
-			),
-		)
-
-		var buf bytes.Buffer
-		context := parser.NewContext()
-
-		if err := md.Convert([]byte(postMarkdown), &buf, parser.WithContext(context)); err != nil {
-			panic(err)
-		}
-
-		metaData := meta.Get(context)
-		title := metaData["title"]
-
-		c.HTML(http.StatusOK, "blog-post", gin.H{
-			"Title":    title,
-			"Markdown": template.HTML(buf.String()),
-		})
-	}
 }
 
 func RemoveExtensionFromFilename(filename string) string {
@@ -160,6 +136,7 @@ func main() {
 	// Clone the layout and add the page content
 	profile := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/profile.html"))
 	blog := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog.html"))
+	blogPost := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog-post.html"))
 	contact := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/contact.html"))
 
 	router.GET("/", func(c *gin.Context) {
@@ -170,23 +147,55 @@ func main() {
 		files := ListFiles("posts")
 		page.BlogData.FileNames = files
 
-		// if c.Request.Header["Hx-Request"] != nil {
-		// 	c.HTML(http.StatusOK, "blog.html", page)
-		// 	return
-		// }
+		if c.Request.Header["Hx-Request"] != nil {
+			c.HTML(http.StatusOK, "blog-partial", files)
+			return
+		}
 		blog.ExecuteTemplate(c.Writer, "index", page)
 	})
 
 	router.GET("/contact", func(c *gin.Context) {
-		// if c.Request.Header["Hx-Request"] != nil {
-		// 	c.HTML(http.StatusOK, "contact.html", page)
-		// 	return
-		// }
+		if c.Request.Header["Hx-Request"] != nil {
+			c.HTML(http.StatusOK, "contact-partial", page)
+			return
+		}
 		contact.ExecuteTemplate(c.Writer, "index", page)
 	})
 
 	fr := FileReader{}
-	router.GET("/blog/:post", PostHandler(fr))
+	router.GET("/blog/:post", func(c *gin.Context) {
+		slug := c.Param("post")
+		postMarkdown, err := fr.Read(slug)
+		if err != nil {
+			c.Status(404)
+			return
+		}
+
+		md := goldmark.New(
+			goldmark.WithExtensions(
+				meta.Meta,
+			),
+		)
+
+		var buf bytes.Buffer
+		context := parser.NewContext()
+		if err := md.Convert([]byte(postMarkdown), &buf, parser.WithContext(context)); err != nil {
+			panic(err)
+		}
+
+		// Get Metadata
+		// TODO: get
+		// metaData := meta.Get(context)
+		// title := metaData["title"]
+
+		if c.Request.Header["Hx-Request"] != nil {
+			c.HTML(http.StatusOK, "blog-post", gin.H{"Markdown": template.HTML(buf.String())})
+			return
+		}
+
+		page.BlogPostData = BlogPostData{Markdown: template.HTML(buf.String())}
+		blogPost.ExecuteTemplate(c.Writer, "index", page)
+	})
 
 	router.Run(":8080")
 }
