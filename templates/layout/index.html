@@ -2,7 +2,8 @@
 <!DOCTYPE html> 
 <html lang="en">
 	<head> 
-		<title></title>
+		<title>Thomas Mastromonaco</title>
+		<link rel="icon" href="/public/favicon.ico"/>
 		<meta chaset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="/css/global.css" rel="stylesheet">
@@ -25,7 +26,7 @@
 		<div style="display: flex;
 		flex-direction: row;
 		justify-content: space-between;">
-			<a href="/" style="text-align: center; margin: 1rem 0rem;">Home</a>
+			<a href="/" style="text-align: center; margin: 25px 0px;">Home</a>
 			{{ range .Headers }}
 				{{ template "header-link" . }}
 			{{ end }}
@@ -39,7 +40,7 @@
 		class="nav-link"
 		hx-get="{{ .Path }}"
 		hx-push-url="{{ .Path }}"
-		hx-target="#page-content" style="text-align: center; margin: 1rem 0rem;">
+		hx-target="#page-content" style="text-align: center; margin: 25px 0px;">
 		{{ .Name }}
 	</div>
 {{ end }}

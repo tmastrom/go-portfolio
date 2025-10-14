@@ -1,6 +1,31 @@
 {{ block "content" . }}
 	<div class="container">  
-		<h1>Thomas Mastromonaco</h1>
-		<p>Software Developer</p>
+		<div>
+			<img src="public/images/profile.jpg" alt="profile picture" style="margin:auto; max-width: 150px;" />
+			<h1 style="text-align: center;">Thomas Mastromonaco</h1>
+			<p style="text-align: center;">Software Developer - Vancouver, BC</p>
+		</div>
+		<div style="display: flex;
+			flex-direction: row;
+			justify-content: center;">
+			<a href="https://github.com/tmastrom" 
+				target="_blank" 
+				rel="noreferrer" 
+				style="text-align: center; margin: 25px;">
+				GitHub
+			</a>
+			<a href="https://www.linkedin.com/in/tmastro/" 
+				target="_blank" 
+				rel="noreferrer" 
+				style="text-align: center; margin: 25px;">
+				Linkedin
+			</a>
+			<a href="thomas.mastromonaco@gmail.com" 
+				target="_blank" 
+				rel="noreferrer" 
+				style="text-align: center; margin: 25px;">
+				Email
+			</a>
+		</div>
 	</div>
 {{ end }}

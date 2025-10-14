@@ -41,7 +41,8 @@ type HeaderData struct {
 func newHeaderData() HeaderData {
 	return HeaderData{
 		Headers: []Header{
-			newHeader("Blog", "/blog"),
+			newHeader("Projects", "/blog"),
+			newHeader("Chess", "/chess"),
 			newHeader("Contact", "/contact"),
 		},
 	}
@@ -123,22 +124,17 @@ func ListFiles(dir string) []string {
 func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
-
-	router.Static("/images", "images")
+	router.Static("/public", "public")
 	router.Static("/css", "css")
-
 	router.LoadHTMLGlob("templates/*.html")
 
-	page := newPage()
-
-	// Parse all the layout
 	layouts := template.Must(template.ParseGlob("templates/layout/*.html"))
-	// Clone the layout and add the page content
 	profile := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/profile.html"))
 	blog := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog.html"))
 	blogPost := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog-post.html"))
 	contact := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/contact.html"))
 
+	page := newPage()
 	router.GET("/", func(c *gin.Context) {
 		profile.ExecuteTemplate(c.Writer, "index", page)
 	})
@@ -146,7 +142,6 @@ func main() {
 	router.GET("/blog", func(c *gin.Context) {
 		files := ListFiles("posts")
 		page.BlogData.FileNames = files
-
 		if c.Request.Header["Hx-Request"] != nil {
 			c.HTML(http.StatusOK, "blog-partial", files)
 			return
@@ -187,12 +182,10 @@ func main() {
 		// TODO: get
 		// metaData := meta.Get(context)
 		// title := metaData["title"]
-
 		if c.Request.Header["Hx-Request"] != nil {
 			c.HTML(http.StatusOK, "blog-post", gin.H{"Markdown": template.HTML(buf.String())})
 			return
 		}
-
 		page.BlogPostData = BlogPostData{Markdown: template.HTML(buf.String())}
 		blogPost.ExecuteTemplate(c.Writer, "index", page)
 	})
