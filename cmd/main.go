@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -247,7 +246,7 @@ func main() {
 
 		var profile LichessProfileRes
 		if err := json.Unmarshal(body, &profile); err != nil {
-			fmt.Println("error:", err)
+			c.IndentedJSON(500, gin.H{"message": "Error marshalling data from lichess"})
 		}
 
 		page.ChessData = newChessData(profile.Perfs["rapid"].Rating)
