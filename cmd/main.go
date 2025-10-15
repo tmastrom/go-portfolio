@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"io"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/parser"
@@ -42,7 +44,7 @@ func newHeaderData() HeaderData {
 	return HeaderData{
 		Headers: []Header{
 			newHeader("Projects", "/blog"),
-			// newHeader("Chess", "/chess"),
+			newHeader("Chess", "/chess"),
 			newHeader("Contact", "/contact"),
 		},
 	}
@@ -64,10 +66,21 @@ func newBlogPostData() BlogPostData {
 	return BlogPostData{}
 }
 
+type ChessData struct {
+	Rapid int
+}
+
+func newChessData(rating int) ChessData {
+	return ChessData{
+		Rapid: rating,
+	}
+}
+
 type Page struct {
 	HeaderData   HeaderData
 	BlogData     BlogData
 	BlogPostData BlogPostData
+	ChessData    ChessData
 }
 
 func newPage() Page {
@@ -75,6 +88,7 @@ func newPage() Page {
 		HeaderData:   newHeaderData(),
 		BlogData:     newBlogData(),
 		BlogPostData: newBlogPostData(),
+		ChessData:    newChessData(0),
 	}
 }
 
@@ -121,9 +135,28 @@ func ListFiles(dir string) []string {
 	return filenames
 }
 
+type LichessPerf struct {
+	Games  int `json:"games"`
+	Rating int `json:"rating"`
+	// rd     int
+	// prog   int
+}
+
+type LichessProfileRes struct {
+	Id       string                 `json:"id"`
+	Username string                 `json:"username"`
+	Perfs    map[string]LichessPerf `json:"perfs"`
+}
+
 func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	router.Static("/public", "public")
 	router.Static("/css", "css")
 	router.LoadHTMLGlob("templates/*.html")
@@ -133,6 +166,7 @@ func main() {
 	blog := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog.html"))
 	blogPost := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/blog-post.html"))
 	contact := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/contact.html"))
+	chess := template.Must(template.Must(layouts.Clone()).ParseFiles("templates/chess.html"))
 
 	page := newPage()
 	router.GET("/", func(c *gin.Context) {
@@ -188,6 +222,41 @@ func main() {
 		}
 		page.BlogPostData = BlogPostData{Markdown: template.HTML(buf.String())}
 		blogPost.ExecuteTemplate(c.Writer, "index", page)
+	})
+
+	router.GET("/chess", func(c *gin.Context) {
+		lichess := os.Getenv("LICHESS_API_KEY")
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", "https://lichess.org/api/account", nil)
+		if err != nil {
+			c.IndentedJSON(500, gin.H{"message": "Error creating request to lichess"})
+		}
+
+		req.Header.Add("Authorization", "Bearer "+lichess)
+		res, err := client.Do(req)
+		if err != nil {
+			c.IndentedJSON(500, gin.H{"message": "Error fetching data from lichess"})
+		}
+		defer res.Body.Close()
+
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			c.IndentedJSON(500, gin.H{"message": "Error reading data from lichess"})
+		}
+
+		var profile LichessProfileRes
+		if err := json.Unmarshal(body, &profile); err != nil {
+			c.IndentedJSON(500, gin.H{"message": "Error marshalling data from lichess"})
+		}
+
+		page.ChessData = newChessData(profile.Perfs["rapid"].Rating)
+
+		if c.Request.Header["Hx-Request"] != nil {
+			c.HTML(http.StatusOK, "chess-partial", page)
+			return
+		}
+		chess.ExecuteTemplate(c.Writer, "index", page)
+
 	})
 
 	router.Run(":8080")
