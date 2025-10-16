@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -139,8 +138,6 @@ func ListFiles(dir string) []string {
 type LichessPerf struct {
 	Games  int `json:"games"`
 	Rating int `json:"rating"`
-	// rd     int
-	// prog   int
 }
 
 type LichessProfileRes struct {
@@ -153,11 +150,21 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	// NOTE: Ignore this in Docker because the environment is loaded from Docker not from the filesystem
-	// os.Getenv("key") will work if the .env is provided using the env_file
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("Error loading .env file")
+	ginMode := os.Getenv("GIN_MODE")
+	if ginMode == "release" {
+		// set to nil because not currently using a proxy for this server
+		// https://gin-gonic.com/en/docs/deployment/
+		router.SetTrustedProxies(nil)
+	}
+
+	// godotenv is only for development
+	// env vars will be loaded via docker environment variables in production
+	if ginMode != "release" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
+
 	}
 
 	router.Static("/public", "public")

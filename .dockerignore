@@ -1,12 +1,15 @@
+release
 .env
+.env.*
 
-.git
+.air.toml
 
 README.md
 
 compose.yml
-.air.toml
 .dockerignore
 Dockerfile
 
 */tmp
+tmp
+tmp/
