@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -152,9 +153,11 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 
-	err := godotenv.Load()
+	// NOTE: Ignore this in Docker because the environment is loaded from Docker not from the filesystem
+	// os.Getenv("key") will work if the .env is provided using the env_file
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Println("Error loading .env file")
 	}
 
 	router.Static("/public", "public")
