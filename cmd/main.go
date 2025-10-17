@@ -43,6 +43,7 @@ type HeaderData struct {
 func newHeaderData() HeaderData {
 	return HeaderData{
 		Headers: []Header{
+			newHeader("Home", "/"),
 			newHeader("Projects", "/blog"),
 			newHeader("Chess", "/chess"),
 			newHeader("Contact", "/contact"),
@@ -180,6 +181,10 @@ func main() {
 
 	page := newPage()
 	router.GET("/", func(c *gin.Context) {
+		if c.Request.Header["Hx-Request"] != nil {
+			c.HTML(http.StatusOK, "profile", page)
+			return
+		}
 		profile.ExecuteTemplate(c.Writer, "index", page)
 	})
 
@@ -187,7 +192,7 @@ func main() {
 		files := ListFiles("posts")
 		page.BlogData.FileNames = files
 		if c.Request.Header["Hx-Request"] != nil {
-			c.HTML(http.StatusOK, "blog-partial", files)
+			c.HTML(http.StatusOK, "blog", files)
 			return
 		}
 		blog.ExecuteTemplate(c.Writer, "index", page)
@@ -195,7 +200,7 @@ func main() {
 
 	router.GET("/contact", func(c *gin.Context) {
 		if c.Request.Header["Hx-Request"] != nil {
-			c.HTML(http.StatusOK, "contact-partial", page)
+			c.HTML(http.StatusOK, "contact", page)
 			return
 		}
 		contact.ExecuteTemplate(c.Writer, "index", page)
@@ -262,11 +267,10 @@ func main() {
 		page.ChessData = newChessData(profile.Perfs["rapid"].Rating)
 
 		if c.Request.Header["Hx-Request"] != nil {
-			c.HTML(http.StatusOK, "chess-partial", page)
+			c.HTML(http.StatusOK, "chess", page.ChessData)
 			return
 		}
 		chess.ExecuteTemplate(c.Writer, "index", page)
-
 	})
 
 	router.Run(":8080")

@@ -1,23 +1,8 @@
 {{ block "content" . }}
-	<div class="container">  
-		<h1>Projects</h1>
-		<ul>	
-			{{ range .BlogData.FileNames }}
-				<li>
-					<div 
-						class="nav-link"
-						hx-get="blog/{{ . }}"
-						hx-push-url="blog/{{ . }}"
-						hx-target="#page-content">
-						{{ . }}
-					</div>
-				</li>
-			{{ end }}
-		</ul>
-	</div>
+	{{ template "blog"  .BlogData.FileNames }}
 {{ end }}
 
-{{ block "blog-partial" . }}
+{{ block "blog" . }}
 	<div class="container">  
 		<h1>Projects</h1>
 		<ul>	

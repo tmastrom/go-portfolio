@@ -1,27 +1,8 @@
 {{ block "content" . }}
-	<div class="container">
-		<h1>Contact</h1>
-		<ul>
-			<li>
-				<a href="https://github.com/tmastrom" target="_blank" rel="noreferrer">
-				GitHub
-				</a>
-			</li>
-			<li>
-				<a href="https://www.linkedin.com/in/tmastro/" target="_blank" rel="noreferrer">
-				LinkedIn
-				</a>
-			</li>
-			<li>
-				<a href="thomas.mastromonaco@gmail.com" target="_blank" rel="noreferrer">
-				Email
-				</a>
-			</li>
-		</ul>
-	</div>
+	{{ template "contact" . }}	
 {{ end }}
 
-{{ block "contact-partial" . }}
+{{ block "contact" . }}
 	<div class="container">
 		<h1>Contact</h1>
 		<ul>

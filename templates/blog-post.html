@@ -1,7 +1,5 @@
 {{ block "content" . }}
-	<div class="container">    
-    	{{ .BlogPostData.Markdown }}
-	</div>
+	{{ template "blog-post" .BlogPostData }}
 {{ end }}
 
 {{ block "blog-post" . }}

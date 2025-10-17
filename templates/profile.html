@@ -1,4 +1,9 @@
 {{ block "content" . }}
+	{{ template "profile" . }}
+{{ end }}
+
+
+{{ block "profile" . }}
 	<div class="container">  
 		<div>
 			<img src="public/images/profile.jpg" alt="profile picture" style="margin:auto; max-width: 150px;" />

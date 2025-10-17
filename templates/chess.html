@@ -1,17 +1,12 @@
-{{ block "chess-partial" . }}
-	<div class="container">  
-		<div>
-			<h1 style="text-align: center;">Chess Rating</h1>
-            <p style="text-align: center;">Current Rapid rating on Lichess: {{ .ChessData.Rapid }} </p>
-		</div>
-	</div>
+{{ block "content" . }}
+	{{ template "chess" .ChessData }}
 {{ end }}
 
-{{ block "content" . }}
+{{ block "chess" . }}
 	<div class="container">  
 		<div>
 			<h1 style="text-align: center;">Chess Rating</h1>
-            <p style="text-align: center;">Current Rapid rating on Lichess: {{ .ChessData.Rapid }} </p>
+            <p style="text-align: center;">Current Rapid rating on Lichess: {{ .Rapid }} </p>
 		</div>
 	</div>
 {{ end }}

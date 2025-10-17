@@ -5,4 +5,4 @@ date: "2025-10-14"
 
 # Go Portfolio
 
-Created this portfolio website to start learning Golang and explor htmx.
+I created this website to start learning Golang and explore htmx.
